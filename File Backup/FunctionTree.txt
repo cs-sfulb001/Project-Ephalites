@@ -1,0 +1,6 @@
+Add 1 0 -> + 0 0
+Add 1 0 -> Addition 0 0
+Subtract 1 0 -> - 0 0
+Multiply 1 0 -> * 0 0
+Divide 1 0 -> / 0 0
+Define 1 0 -> Defintion

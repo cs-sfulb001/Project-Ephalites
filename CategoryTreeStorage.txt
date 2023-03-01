@@ -1,0 +1,11 @@
+Category 0 -> Vechicle 0 -> Car 0 -> Parts 0 -> Breaks 0
+Category 0 -> Vechicle 0 -> Car 0 -> Parts 0 -> Wheels 0 -> Rubber 0
+Category 0 -> Vechicle 0 -> Bus 0 -> Parts 0 -> Wheels 0 -> Rubber 0
+Category 0 -> Vechicle 0 -> Bike 0 -> Parts 0 -> Breaks 0
+Category 0 -> Vechicle 0 -> Bike 0 -> Parts 0 -> Wheels 0 -> Rubber 0
+Category 0 -> Vechicle 0 -> Truck 0 -> Parts 0 -> Breaks 0
+Category 0 -> Vechicle 0 -> Truck 0 -> Parts 0 -> Wheels 0 -> Rubber 0
+Category 0 -> Vechicle 0 -> Cart 0 -> Parts 0 -> Wheels 0 -> Wood 0
+Category 0 -> Animals 0 -> Cat 0 -> Parts 0 -> Claws 0
+Category 0 -> Animals 0 -> Dog 0
+Category 0 -> Data 0

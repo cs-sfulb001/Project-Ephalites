@@ -1,0 +1,4 @@
+Problem occuring with Category Tree loading leading to data duplication and lost.
+Lead: When min use is 3, common link is "Breaks" when it comes to duplication.
+Optimization opertunity:
+In Category and Language files, can greatly reduce the number of chars used to store data structure.

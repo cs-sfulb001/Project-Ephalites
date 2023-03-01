@@ -1,0 +1,15 @@
+Language 1 0 -> Noun 1 0 -> Wheels 0 0
+Language 1 0 -> Noun 1 0 -> Rubber 0 0
+Language 1 0 -> Noun 1 0 -> Wood 0 0
+Language 1 0 -> Noun 1 0 -> Claws 0 0
+Language 1 0 -> Noun 1 0 -> Dog 0 0
+Language 1 0 -> Noun 1 0 -> Data 0 2
+Language 1 0 -> Noun 1 0 -> House 0 0
+Language 1 0 -> Pronoun 1 0 -> Him 0 0
+Language 1 0 -> Pronoun 1 0 -> Her 0 0
+Language 1 0 -> Pronoun 1 0 -> He 0 0
+Language 1 0 -> Pronoun 1 0 -> Them 0 0
+Language 1 0 -> Pronoun 1 0 -> She 0 0
+Language 1 0 -> Pronoun 1 0 -> They 0 0
+Language 1 0 -> Verb 1 0 -> Run 0 0
+Language 1 0 -> Verb 1 0 -> Walk 0 0
