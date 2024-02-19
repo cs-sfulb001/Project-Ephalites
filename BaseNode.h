@@ -2,7 +2,9 @@
 #define BASENODE_H
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #include "CatNode.h"
+
 /*
 Basic Node type for trees that will be used for
 Language tree and more.
@@ -39,14 +41,16 @@ public:
 	std::string const getWord();
 	bool const getTitle();
 	BaseNode* const getParent();
-	BaseNode* const getChild(int);
-	std::vector<BaseNode*> const getChildren();
+	BaseNode* const getChild(std::string);
+	std::unordered_map<int, BaseNode*> const getChildren();
 	int const getNumChildren();
 	virtual CatNode* const getCTEqiv();
 	int const getTimesUsed();
 	std::string const getDef();
 	std::string& getWordRef();
 	int& getTimesUsedRef();
+	std::unordered_map<int, BaseNode*>::iterator getChildernBegin();
+	std::unordered_map<int, BaseNode*>::iterator getChildernEnd();
 	//Sets
 	void setParent(BaseNode&);
 	void setWord(std::string);
@@ -66,7 +70,8 @@ public:
 	*/
 	void removeParent();
 	//Data Manip
-	void sortChildren();
+	//Depercated due to switch to unordered map from vector
+	//void sortChildren();
 	//Opereator Overloads
 	friend std::ostream& operator<<(std::ostream& out, const BaseNode& target)
 	{
@@ -74,14 +79,22 @@ public:
 		return out;
 	}
 	int operator++(int);
+	std::string Word;
 private:
 
-	std::string Word;
 	bool Title;
 	BaseNode* Parent;
-	std::vector<BaseNode*> Children;
+	std::unordered_map<int, BaseNode*> Children;
 	int timesUsed;
 	std::string Def;
 };
 
+template<>
+struct std::hash<BaseNode>
+{
+	std::size_t operator()(const BaseNode& node) const noexcept
+	{
+		return std::hash<std::string>{}(node.Word); // or use boost::hash_combine
+	}
+};
 #endif

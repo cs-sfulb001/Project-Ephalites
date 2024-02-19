@@ -23,11 +23,16 @@ void LanguageTree::PrintLoadedTree()
 {
     if (start->getNumChildren() == 0)
         std::cout << std::setw(10) << start->getWord() << " " << start->getTitle() << std::endl;
-    for (int i = 0; i < start->getNumChildren(); i++)
+    else
     {
-        std::cout << std::setw(10) << *start << " -> ";
-        PrintLoadedTree(start->getChild(i), 1);
-        std::cout << std::endl;
+        std::unordered_map<int, BaseNode*>::iterator currentChild = start->getChildernBegin();
+        auto end = start->getChildernEnd();
+        while (currentChild != end) {
+            std::cout << std::setw(10) << *start << " -> ";
+            PrintLoadedTree(currentChild->second, 1);
+            std::cout << std::endl;
+            currentChild++;
+        }
     }
 }
 void LanguageTree::PrintLoadedTree(BaseNode* target, int depth)
@@ -39,21 +44,18 @@ void LanguageTree::PrintLoadedTree(BaseNode* target, int depth)
     }
     else
     {
-        for (int i = 0; i < num; i++)
-        {
-            if (i == 0)
-            {
-                std::cout << std::setw(10) << *target << " -> ";
-                PrintLoadedTree(target->getChild(i), depth + 1);
-                std::cout << std::endl;
-            }
-            else
-            {
-                int a = 12 * (depth + 1) + 4 * depth;
-                std::cout << std::setw(a) << *target << " -> ";
-                PrintLoadedTree(target->getChild(i), depth + 1);
-                std::cout << std::endl;
-            }
+        std::unordered_map<int, BaseNode*>::iterator currentChild = start->getChildernBegin();
+        auto end = start->getChildernEnd();
+        std::cout << std::setw(10) << *target << " -> ";
+        PrintLoadedTree(currentChild->second, depth + 1);
+        std::cout << std::endl;
+        currentChild++;
+        while (currentChild != end) {
+            int a = 12 * (depth + 1) + 4 * depth;
+            std::cout << std::setw(a) << *target << " -> ";
+            PrintLoadedTree(currentChild->second, depth + 1);
+            std::cout << std::endl;
+            currentChild++;
         }
     }
 }
@@ -176,16 +178,23 @@ void LanguageTree::SaveTree()
 {
     std::ofstream out;
     out.open("LanguageTree.txt");
-    for (int i = 0; i < start->getNumChildren(); i++)
+    auto currentChild = start->getChildernBegin();
+    auto end = start->getChildernEnd();
+    while(currentChild!=end)
     {
-        if (start->getChild(i)->getNumChildren() == 0)
+        if (currentChild->second->getNumChildren() == 0)
         {
-            out << *start << " -> " << *start->getChild(i) << std::endl;
+            out << *start << " -> " << *currentChild->second << std::endl;
         }
-        for (int j = 0; j < start->getChild(i)->getNumChildren(); j++)
+
+        auto grandChildren = currentChild->second->getChildernBegin();
+        auto grandEnd = currentChild->second->getChildernEnd();
+        while(grandChildren!=grandEnd)
         {
-            out << *start << " -> " << *start->getChild(i) << " -> " << *start->getChild(i)->getChild(j) << std::endl;
+            out << *start << " -> " << *currentChild->second << " -> " << *grandChildren->second << std::endl;
+            grandChildren++;
         }
+        currentChild++;
     }
     std::ifstream storage;
     storage.open("LTreeStorage.txt");
@@ -208,28 +217,22 @@ BaseNode* LanguageTree::getStart()
     //Find Node Functions
 BaseNode* LanguageTree::findWord(std::string targetWord)
 {
-    return findWord(targetWord, start);
+    auto it = start->getChildernBegin();
+    auto end = start->getChildernEnd();
+    while (it != end) {
+        BaseNode* result = it->second->getChild(targetWord);
+        if (result != nullptr)
+            return result;
+        it++;
+    }
+    return nullptr;
 }
 BaseNode* LanguageTree::findWord(std::string targetWord, std::string parent)
 {
-    if (parent == "Noun" && noun != nullptr)
-    {
-        return findWord(targetWord, noun);
-    }
-    if (parent == "Pronoun" && pronoun != nullptr)
-    {
-        return findWord(targetWord, pronoun);
-    }/*
-    if(parent=="Propernoun"&&propernoun!=nullptr);
-    {
-        std::cout << "In propernoun" << std::endl;
-        return findWord(targetWord, propernoun);
-    }*/
-    if (parent == "Verb" && verb != nullptr)
-    {
-        return findWord(targetWord, verb);
-    }
-    return findWord(targetWord, start);
+    BaseNode* parentNode = start->getChild(parent);
+    if (parentNode != nullptr)
+        return parentNode->getChild(targetWord);
+    return findWord(targetWord);
 }
 bool LanguageTree::inFile(std::string targetWord)
 {
@@ -258,22 +261,6 @@ int LanguageTree::TimesUsedFromFile(std::string targetWord)//Crashes if file get
     }
     storage.close();
     return -1;
-}
-BaseNode* LanguageTree::findWord(std::string targetWord, BaseNode* currentNode)//Caindent for multi threading?
-{
-    //std::cout<<"Current Node address"<<currentNode << std::endl;
-    //std::cout<<"Crashing in FindWord?"<<std::endl;
-    if (currentNode->getWord() == targetWord)
-        return currentNode;
-    for (int i = 0; i < currentNode->getNumChildren(); i++)
-    {
-        //std::cout<<"In for loop?"<<std::endl;
-        BaseNode* NodeReturn = nullptr;
-        NodeReturn = findWord(targetWord, currentNode->getChild(i));
-        if (NodeReturn != nullptr)
-            return NodeReturn;
-    }
-    return nullptr;
 }
 
 //add node functions
@@ -344,10 +331,5 @@ void LanguageTree::RemoveLangNode(std::string Target)
 }
 BaseNode* LanguageTree::findTitle(std::string Target)
 {
-    for (int i = 0; i < start->getNumChildren(); i++)
-    {
-        if (start->getChild(i)->getWord() == Target)
-            return start->getChild(i);
-    }
-    return nullptr;
+    return start->getChild(Target);
 }

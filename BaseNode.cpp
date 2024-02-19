@@ -52,11 +52,11 @@ BaseNode* const BaseNode::getParent()
 {
 	return *&Parent;
 }
-BaseNode* const BaseNode::getChild(int slot)
+BaseNode* const BaseNode::getChild(std::string word)
 {
-	return *&Children[slot];
+	return *&Children[std::hash<std::string>()(word)];
 }
-std::vector<BaseNode*> const BaseNode::getChildren()
+std::unordered_map<int, BaseNode*> const BaseNode::getChildren()
 {
 	return Children;
 }
@@ -108,11 +108,14 @@ For adding children under the current node.
 */
 void BaseNode::addChild(std::string childWord, bool childTitle, int times)
 {
-	Children.push_back(new BaseNode(childWord, childTitle, *this , times));
+	BaseNode* newChild = new BaseNode(childWord, childTitle, *this, times);
+	int hashvalue = std::hash<BaseNode>()(*newChild);
+	Children.insert(std::make_pair(hashvalue, newChild));
 }
 void BaseNode::addChild(BaseNode& newChild)
 {
-	Children.push_back(&newChild);
+	int hashvalue = std::hash<BaseNode>()(newChild);
+	Children.insert(std::make_pair(hashvalue, &newChild));
 }
 void BaseNode::setTimesUsed(int times)
 {
@@ -121,20 +124,22 @@ void BaseNode::setTimesUsed(int times)
 //Remove
 void BaseNode::removeChild(std::string target)
 {
-	for (int i = 0; i < Children.size(); i++)
-	{
-		if (Children[i]->getWord() == target)
-		{
-			Children.erase(Children.begin()+i);
-			return;
-		}
-	}
+	int targetHash = std::hash<std::string>()(target);
+	Children.erase(targetHash);
 }
 void BaseNode::removeParent()
 {
 	Parent = nullptr;
 }
+std::unordered_map<int, BaseNode*>::iterator BaseNode::getChildernBegin() {
+	return Children.begin();
+}
+std::unordered_map<int, BaseNode*>::iterator BaseNode::getChildernEnd() {
+	return Children.end();
+}
 //Data Manip
+//Depercated due to switch to unordered map from vector
+/*
 void BaseNode::sortChildren()
 {
 	for (int i = 0; i < Children.size(); i++)
@@ -153,7 +158,7 @@ void BaseNode::sortChildren()
 		if (!moved)
 			return;
 	}
-}
+}*/
 //Operator overload
 
 int BaseNode::operator++(int)
@@ -161,7 +166,7 @@ int BaseNode::operator++(int)
 	if (timesUsed < 2147483647) 
 	{
 		int temp = timesUsed++;
-		this->Parent->sortChildren();
+		//this->Parent->sortChildren();
 		return temp;
 	}
 	return timesUsed;

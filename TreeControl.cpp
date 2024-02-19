@@ -192,9 +192,12 @@ void TreeControl::printCollisions()
 {
     header("Collisions", 80, '_');
     BaseNode* Begining = LTree.getStart();
-    for (int i = 0; i < Begining->getNumChildren(); i++)
+    auto children = Begining->getChildernBegin();
+    auto end = Begining->getChildernEnd();
+    while(children!=end)
     {
-        printCollisions(Begining->getChild(i));
+        printCollisions(children->second);
+        children++;
     }
     waitTillEnter();
 }
@@ -205,9 +208,12 @@ void TreeControl::printCollisions(BaseNode* target)
         std::cout << *target << std::endl;
         target->getCTEqiv()->PrintCollisions();
     }
-    for (int i = 0; i < target->getNumChildren(); i++)
+    auto children = target->getChildernBegin();
+    auto end = target->getChildernEnd();
+    while (children != end)
     {
-        printCollisions(target->getChild(i));
+        printCollisions(children->second);
+        children++;
     }
 }
 void TreeControl::AddToLTree()
@@ -387,16 +393,24 @@ void TreeControl::ConnectInCTree(CatNode* child, CatNode* parent)
         while (true)
         {
             std::cout << "Which parent of " << parent->getWord() << " will be " << child->getWord() << " collision parent " << std::endl;
-            for (int i = 0; i < parent->getNumParents(); i++)
+            auto Grandparent = parent->getParentsBegin();
+            auto end = parent->getParentsEnd();
+            int i = 0;
+            std::vector<std::string> options;
+            while(Grandparent!=end)
             {
-                if (parent->getParent(i)->checkCollisionList(CollisionList))//potental error in future
-                    std::cout << i << ". " << parent->getParent(i)->getWord() << std::endl;
+                if (Grandparent->second->checkCollisionList(CollisionList))//potental error in future
+                {
+                    std::cout << i << ". " << Grandparent->second->getWord() << std::endl;
+                    options.push_back(Grandparent->second->getWord());
+                }
+                Grandparent++;
             }
             int slot = -1;
             std::cin >> slot;
-            if (slot != -1 && parent->getParent(slot)->checkCollisionList(CollisionList))
+            if (slot != -1 && parent->getParent(options[slot])->checkCollisionList(CollisionList))
             {
-                CollisionList.push_back(parent->getParent(slot)->getWord());
+                CollisionList.push_back(parent->getParent(options[slot])->getWord());
                 break;
             }
             else

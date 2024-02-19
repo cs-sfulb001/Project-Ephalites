@@ -20,9 +20,12 @@ void CategoryTree::SaveTree()
     Path.push_back(start);
     std::ofstream out;
     out.open("CategoryTree.txt");
-    for (int i = 0; i < start->getNumChildren(); i++)
+    auto CurrentNode = start->getChildernBegin();
+    auto end = start->getChildernEnd();
+    while(CurrentNode!=end)
     {
-        SaveTree(start->getChild(i), CollisionParentList, Path, out);
+        SaveTree(CurrentNode->second, CollisionParentList, Path, out);
+        CurrentNode++;
     }
     std::ifstream storage;
     storage.open("CategoryTreeStorage.txt");
@@ -39,17 +42,19 @@ void CategoryTree::SaveTree(CatNode* Target, std::vector<std::string> CollisionP
 {
     Path.push_back(Target);
     bool printed = 0;
-    for (int i = 0; i < Target->getNumChildren(); i++)
+    auto CurrentNode = Target->getChildernBegin();
+    auto end = Target->getChildernEnd();
+    while (CurrentNode!=end)
     {
         bool added = 0;
-        if (Target->getChild(i)->checkCollisionList(CollisionParentList))
+        if (CurrentNode->second->checkCollisionList(CollisionParentList))
         {
-            if (Target->getChild(i)->getIsCollision())
+            if (CurrentNode->second->getIsCollision())
             {
                 CollisionParentList.push_back(Target->getWord());
                 added = 1;
             }
-            SaveTree(Target->getChild(i), CollisionParentList, Path, out);
+            SaveTree(CurrentNode->second, CollisionParentList, Path, out);
             if (added)
             {
                 CollisionParentList[CollisionParentList.size() - 1].erase();
@@ -103,26 +108,14 @@ bool CategoryTree::CheckCollisionCreation(CatNode* Child, std::string Parent)
 }
 void CategoryTree::CollisionBackFill(CatNode* CollisionPoint, std::vector<std::string> CollisionParents)
 {
-    CatNode* Target = nullptr;
     int newCollision = CollisionParents.size();
-    std::cout << CollisionPoint->getNumParents() << std::endl;
-    CollisionParents.push_back(CollisionPoint->getParent(0)->getWord());
-    for (int i = 0; i < CollisionPoint->getNumChildren(); i++)
-    {
-        bool added = 0;
-        Target = CollisionPoint->getChild(i);
-        Target->AddCollisionParent(CollisionParents);
-        if (Target->getIsCollision())
-        {
-            CollisionParents.push_back(CollisionPoint->getWord());
-            added = 1;
-        }
-        for (int j = 0; j < Target->getNumChildren(); j++)
-        {
-            CollisionFill(Target->getChild(j), newCollision, Target, CollisionParents);
-        }
-        if (added)
-            CollisionParents.erase(CollisionParents.begin() + (CollisionParents.size()-1));
+    //std::cout << CollisionPoint->getNumParents() << std::endl;
+    CollisionParents.push_back(CollisionPoint->getParentsBegin()->second->getWord());
+    auto CollisionChildrend = CollisionPoint->getChildernBegin();
+    auto end = CollisionPoint->getChildernEnd();
+    while (CollisionChildrend != end) {//Simplified with use of CollisionFill. Need to double check it holds the same functionality.
+        CollisionFill(CollisionChildrend->second, newCollision, CollisionPoint, CollisionParents);
+        CollisionChildrend++;
     }
 }
 void CategoryTree::CollisionFill(CatNode* Target, int newCollisionPoint, CatNode* TargetParent, std::vector<std::string> CollisionParents)
@@ -135,12 +128,15 @@ void CategoryTree::CollisionFill(CatNode* Target, int newCollisionPoint, CatNode
         CollisionParents.push_back(TargetParent->getWord());
     }
     //std::cout << "Or with in the for loop" << std::endl;
-    for (int i = 0; i < Target->getNumChildren(); i++)
-    {
+    auto TargetChildrend = Target->getChildernBegin();
+    auto end = Target->getChildernEnd();
+    while (TargetChildrend != end) {
         //std::cout << "CollisionFill happening" << std::endl;
-        CollisionFill(Target->getChild(i), newCollisionPoint, Target, CollisionParents);
+        CollisionFill(TargetChildrend->second, newCollisionPoint, Target, CollisionParents);
         //std::cout << "CollisionFill Done" << std::endl;
+        TargetChildrend++;
     }
+    
 }
 CatNode* CategoryTree::getStart()
 {
@@ -153,13 +149,16 @@ void CategoryTree::PrintLoadedTree()
         PrintNode(start);
         return;
     }
-    for (int i = 0; i < start->getNumChildren(); i++)
+    auto children = start->getChildernBegin();
+    auto end = start->getChildernEnd();
+    while(children!=end)
     {
         std::cout << std::setw(10);
         start->print(std::cout);
         std::cout<< " -> ";
         std::vector<std::string> CollisionParentList;
-        PrintLoadedTree(start->getChild(i), CollisionParentList, 1);
+        PrintLoadedTree(children->second, CollisionParentList, 1);
+        children++;
     }
 }
 void CategoryTree::PrintLoadedTree(CatNode* Target, std::vector<std::string> CollisionParentList, int depth)
@@ -170,17 +169,20 @@ void CategoryTree::PrintLoadedTree(CatNode* Target, std::vector<std::string> Col
         return;
     }
     bool printed = 0;
-    for (int i = 0; i < Target->getNumChildren(); i++)
+
+    auto children = Target->getChildernBegin();
+    auto end = Target->getChildernEnd();
+    while(children!=end)
     {
         bool added = 0;
-        if (Target->getChild(i)->checkCollisionList(CollisionParentList))
+        if (children->second->checkCollisionList(CollisionParentList))
         {
             int a = 10;
             if (printed)
             {
                 a = 10 * (depth + 1) + 6 * depth;
             }
-            if (Target->getChild(i)->getIsCollision())
+            if (children->second->getIsCollision())
             {
                 CollisionParentList.push_back(Target->getWord());
                 added = 1;
@@ -188,7 +190,7 @@ void CategoryTree::PrintLoadedTree(CatNode* Target, std::vector<std::string> Col
             std::cout << std::setw(a);
             Target->print(std::cout);
             std::cout<< " -> ";
-            PrintLoadedTree(Target->getChild(i), CollisionParentList, depth + 1);
+            PrintLoadedTree(children->second, CollisionParentList, depth + 1);
             if (added)
             {
                 CollisionParentList[CollisionParentList.size() - 1].erase();

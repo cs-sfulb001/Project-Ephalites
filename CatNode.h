@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <vector>
 #include <iostream>
+#include <unordered_map>
 
 class CatNode
 {
@@ -17,8 +18,12 @@ public:
     int const getTimesUsed();
     int const getNumChildren();
     int const getNumParents();
-    CatNode* const getChild(int);
-    CatNode* const getParent(int);
+    CatNode* const getChild(std::string);
+    CatNode* const getParent(std::string);
+    std::unordered_map<int, CatNode*>::iterator getChildernBegin();
+    std::unordered_map<int, CatNode*>::iterator getChildernEnd();
+    std::unordered_map<int, CatNode*>::iterator getParentsBegin();
+    std::unordered_map<int, CatNode*>::iterator getParentsEnd();
     bool const getIsCollision();
     bool const isParent(std::string);
     bool const isParent(CatNode&);
@@ -50,14 +55,22 @@ public:
     */
     void print(std::ostream&);
     void PrintCollisions();
+    std::string* word;
 
 private:
-    std::string* word;
     int* TimesUsed;
     bool title;
-    std::vector <CatNode*> Children;
-    std::vector <CatNode*> Parents;
+    std::unordered_map <int, CatNode*> Children;
+    std::unordered_map <int, CatNode*> Parents;
     std::vector<std::vector <std::string>> CollisionParent;
     bool isCollision;
 };
 
+template<>
+struct std::hash<CatNode>
+{
+    std::size_t operator()(const CatNode& node) const noexcept
+    {
+        return std::hash<std::string>{}(*node.word);
+    }
+};

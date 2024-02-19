@@ -93,7 +93,6 @@ private:
     Recursive function that checks if the desired
     word is a desendent of the input node
     */
-    BaseNode* findWord(std::string, BaseNode*);
 };
 
 

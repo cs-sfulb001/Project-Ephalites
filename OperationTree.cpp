@@ -54,10 +54,12 @@ BaseNode* OperationTree::findFunction(std::string targetWord, BaseNode* currentN
 {
     if (currentNode->getWord() == targetWord)
         return currentNode;
-    for (int i = 0; i < currentNode->getNumChildren(); i++)
+    auto children = currentNode->getChildernBegin();
+    auto end = currentNode->getChildernEnd();
+    while(children!=end)
     {
         BaseNode* NodeReturn = nullptr;
-        NodeReturn = findFunction(targetWord, currentNode->getChild(i));
+        NodeReturn = findFunction(targetWord, children->second);
         if (NodeReturn != nullptr)
             return NodeReturn;
     }

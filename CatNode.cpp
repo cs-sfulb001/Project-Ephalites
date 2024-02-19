@@ -60,6 +60,7 @@ int const CatNode::getTimesUsed()
 {
     return *TimesUsed;
 }
+/*
 int const CatNode::getNumChildren()
 {
 	return Children.size();
@@ -68,13 +69,14 @@ int const CatNode::getNumParents()
 {
 	return Parents.size();
 }
-CatNode* const CatNode::getChild(int slot)
+*/
+CatNode* const CatNode::getChild(std::string word)
 {
-	return Children[slot];
+	return Children[std::hash<std::string>{}(word)];
 }
-CatNode* const CatNode::getParent(int slot)
+CatNode* const CatNode::getParent(std::string word)
 {
-	return Parents[slot];
+	return Parents[std::hash<std::string>{}(word)];
 }
 bool const CatNode::getIsCollision()
 {
@@ -82,24 +84,12 @@ bool const CatNode::getIsCollision()
 }
 bool const CatNode::isParent(std::string target)
 {
-    for (int i = 0; i < Parents.size(); i++)
-    {
-        if (Parents[i]->getWord() == target)
-        {
-            return true;
-        }
-    }
-    return false;
+    return Parents[std::hash<std::string>{}(target)] != nullptr;
 }
 
 bool const CatNode::isParent(CatNode& target)
 {
-    for (int i = 0; i < Parents.size(); i++)
-    {
-        if (Parents[i] == &target)
-            return true;
-    }
-    return false;
+    return Parents[std::hash<CatNode>{}(target)]== &target;
 }
 bool const CatNode::getAnyCollisionParents()
 {
@@ -113,7 +103,7 @@ std::vector<std::string> CatNode::getCollisionList(int slot)
 }
 bool const CatNode::getAnyParents()
 {
-    return Parents.size() != 0;
+    return !(Parents.empty());
 }
 //Adds
 void CatNode::AddCollisionParent(std::vector <std::string> CCP)
@@ -187,34 +177,22 @@ void CatNode::AddCollisionParent(std::vector<std::string> CCP, int newCollisionP
 }
 void CatNode::addParent(CatNode& Target)
 {
-    Parents.push_back(&Target);
+    int hashvalue = std::hash<CatNode>()(Target);
+    Parents.insert(std::make_pair(hashvalue, &Target));
 }
 void CatNode::addChild(CatNode& Target)
 {
-    Children.push_back(&Target);
+    int hashvalue = std::hash<CatNode>()(Target);
+    Children.insert(std::make_pair(hashvalue, &Target));;
 }
 //Removes
 void CatNode::removeChild(std::string Target)
 {
-    for (int i = 0; i < Children.size(); i++)
-    {
-        if (Children[i]->getWord() == Target)
-        {
-            Children.erase(Children.begin() + i);
-            return;
-        }
-    }
+    Children.erase(std::hash<std::string>{}(Target));
 }
 void CatNode::removeParent(std::string Target)
 {
-    for (int i = 0; i < Parents.size(); i++)
-    {
-        if (Parents[i]->getWord() == Target)
-        {
-            Parents.erase(Parents.begin() + i);
-            return;
-        }
-    }
+    Parents.erase(std::hash<std::string>{}(Target));
 }
 //Data Manipulation
 bool const CatNode::checkCollisionList(std::vector<std::string> ListToCheck)
@@ -263,4 +241,18 @@ void CatNode::PrintCollisions()
         }
         std::cout << std::endl;
     }
+}
+
+
+std::unordered_map<int, CatNode*>::iterator CatNode::getChildernBegin(){
+    return Children.begin();
+}
+std::unordered_map<int, CatNode*>::iterator CatNode::getChildernEnd() {
+    return Children.end();
+}
+std::unordered_map<int, CatNode*>::iterator CatNode::getParentsBegin(){
+    return Parents.begin();
+}
+std::unordered_map<int, CatNode*>::iterator CatNode::getParentsEnd() {
+    return Parents.end();
 }
