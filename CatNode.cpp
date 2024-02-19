@@ -256,3 +256,9 @@ std::unordered_map<int, CatNode*>::iterator CatNode::getParentsBegin(){
 std::unordered_map<int, CatNode*>::iterator CatNode::getParentsEnd() {
     return Parents.end();
 }
+const int CatNode::getNumChildren() {
+    return Children.size();
+}
+const int CatNode::getNumParents() {
+    return Parents.size();
+}
