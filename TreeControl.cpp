@@ -25,6 +25,7 @@ TreeControl::TreeControl(int minTU, double maxRAM)
     minTimesUsed = minTU;
     RAM.desiredRAMUsage(maxRAM);
 }
+//Some loaded lines are being sent to CTStorage
 void TreeControl::buildTrees()
 {
     std::cout << "Loading LTree" << std::endl;
@@ -43,10 +44,14 @@ void TreeControl::LoadCTreeFile()//Might be causing data lost and data duplicati
     {
         std::vector<std::string> brokenLine = SplitStringBySpaceOnly(Line);
         int added = 0;
+        //std::cout << "Is it in the for loop?" << std::endl;
         for (int i = 1; i < (brokenLine.size() + 1) / 3; i++)
         {
+            //std::cout << "Loop #"<<i << std::endl;
             if (LTree.findWord(brokenLine[i * 3]) != nullptr)//If it is in the LTree
             {
+
+                //std::cout << "IF?" << std::endl;
                 added++;
                 CatNode* parent = nullptr;
                 if (i == 1)
@@ -54,7 +59,7 @@ void TreeControl::LoadCTreeFile()//Might be causing data lost and data duplicati
                 else
                 {
                     BaseNode * LParent = nullptr;
-                    LParent = LTree.findWord(brokenLine[(i - 1) * 3]);//nullptr rav when min is !=0
+                    LParent = LTree.findWord(brokenLine[(i - 1) * 3]);
 
                     if (LParent == nullptr || LParent->getCTEqiv() == nullptr)
                         parent = LoadParent(brokenLine, i - 1);
@@ -82,6 +87,8 @@ void TreeControl::LoadCTreeFile()//Might be causing data lost and data duplicati
             }
             else if (LTree.findWord(brokenLine[i * 3]) == nullptr && !RAM.aboveTargetUsage() && LTree.TimesUsedFromFile(brokenLine[i * 3]) >= minTimesUsed)//If it is not in the LTree and there is RAM for it and it meets the minTimesUsed condition
             {
+
+                //std::cout << "Else IF?" << std::endl;
                 added++;
                 CatNode* parent = nullptr;
                 if (i == 1)
@@ -91,12 +98,19 @@ void TreeControl::LoadCTreeFile()//Might be causing data lost and data duplicati
                 else
                 {
                     BaseNode* LParent = nullptr;
-                    LParent = LTree.findWord(brokenLine[(i - 1) * 3]);//nullptr rav when min is !=0
-
+                    //std::cout << "101" << std::endl;
+                    LParent = LTree.findWord(brokenLine[(i - 1) * 3]);
+                    //std::cout << "103" << std::endl;
                     if (LParent == nullptr || LParent->getCTEqiv() == nullptr)
+                    {
+                        //std::cout << "If?" << std::endl;
                         parent = LoadParent(brokenLine, i - 1);
+                    }
                     else
+                    {
+                        //std::cout << "Else?" << std::endl;
                         parent = LParent->getCTEqiv();
+                    }
                 }
                 std::vector<std::string> CPP;
                 //std::cout << "This loop?" << std::endl;
@@ -112,7 +126,8 @@ void TreeControl::LoadCTreeFile()//Might be causing data lost and data duplicati
             }
             //std::cout << "Does it make it to the end of the loop?" << std::endl;
         }
-        if (added != ((brokenLine.size() + 1) / 3)-1)//Something Weird is happening
+        std::cout << "Escaped For loop" << std::endl;
+        if (added != ((brokenLine.size() + 1) / 3)-1)
             out << Line << std::endl;
     }
 }
@@ -121,33 +136,47 @@ CatNode* TreeControl::LoadParent(std::vector<std::string> List, int target)
     //std::cout << "This function?" << std::endl;
     //std::cout << "Target" << target << "\n" << (List.size() + 1) / 3 << std::endl;
     CatNode* parent = nullptr;
-    if (target == 1)
+    if (target == 1)//After IF Else
+    {
         parent = CTree.getStart();
+    }
     else
     {
         BaseNode* LParent = nullptr;
         LParent = LTree.findWord(List[(target - 1) * 3]);
         if (LParent == nullptr || LParent->getCTEqiv() == nullptr)
         {
+            std::cout << "This? 146" << std::endl;
             parent = LoadParent(List, target - 1);
         }
         else
         {
+            std::cout << "This? 151" << std::endl;
             parent = LParent->getCTEqiv();
         }
     }
     std::vector<std::string> CPP;
-    //std::cout << "In this loop?" << std::endl;
+    std::cout << "In this loop?" << std::endl;
+    std::cout << "Current target: " << target << " " << List[target * 3] << std::endl;
+    CTree.PrintLoadedTree();
+    LTree.PrintLoadedTree();
     for (int i = 1; i < target; i++)
     {
-        if (LTree.findWord(List[i * 3])->getCTEqiv()->getIsCollision())
+        std::cout << List[i*3] << " at i: " << i << std::endl;
+        if (LTree.findWord(List[i * 3])->getCTEqiv()->getIsCollision())//Read Access violation due to vechile being removed from langauge tree
             CPP.push_back(List[(i - 1) * 3]);
     }
-    LTree.LoadWord(List[target * 3]);
+    std::cout << "168" << std::endl;
+    LTree.LoadWord(List[target * 3]);//Problem Occurring
+    std::cout << "170" << std::endl;
     BaseNode* child = LTree.findWord(List[target * 3]);
+    std::cout << "172" << std::endl;
     child = morphBaseNode(child);
+    LTree.PrintLoadedTree();
+    std::cout << "174" << std::endl;
     CTree.ConnectNodes(child->getCTEqiv(), parent, &CPP);
-    //std::cout << "Leaving function" << std::endl;
+    LTree.PrintLoadedTree();
+    std::cout << "Leaving function" << std::endl;
     return child->getCTEqiv();
 }
 BaseNodeExt* TreeControl::morphBaseNode(BaseNode* oldNode)
@@ -155,17 +184,20 @@ BaseNodeExt* TreeControl::morphBaseNode(BaseNode* oldNode)
     BaseNodeExt* morphedNode = nullptr;
     morphedNode = new BaseNodeExt(oldNode->getWord(), oldNode->getTitle(), oldNode->getTimesUsed());
     BaseNode* Parent = oldNode->getParent();
+    std::cout << "Num Children " << Parent->getNumChildren() << std::endl;
     morphedNode->setParent(*Parent);
     Parent->removeChild(oldNode->getWord());
     Parent->addChild(*morphedNode);
     for (int i = 0; i < oldNode->getNumChildren(); i++)
     {
+        //Should not be needed
         oldNode->getChild(0)->setParent(*morphedNode);
         morphedNode->addChild(*(oldNode->getChild(0)));
         oldNode->removeChild(oldNode->getChild(0)->getWord());
     }
     oldNode->removeParent();
     delete oldNode;
+    std::cout << "Num Children " << Parent->getNumChildren() << std::endl;
     return morphedNode;
 }
 void TreeControl::SaveTrees()

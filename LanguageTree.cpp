@@ -35,6 +35,7 @@ void LanguageTree::PrintLoadedTree()
         }
     }
 }
+//Printing has uncovered a nullptr that has been added to the language tree between the 1st and second addition
 void LanguageTree::PrintLoadedTree(BaseNode* target, int depth)
 {
     int num = target->getNumChildren();
@@ -44,8 +45,8 @@ void LanguageTree::PrintLoadedTree(BaseNode* target, int depth)
     }
     else
     {
-        std::unordered_map<int, BaseNode*>::iterator currentChild = start->getChildernBegin();
-        auto end = start->getChildernEnd();
+        std::unordered_map<int, BaseNode*>::iterator currentChild = target->getChildernBegin();
+        auto end = target->getChildernEnd();
         std::cout << std::setw(10) << *target << " -> ";
         PrintLoadedTree(currentChild->second, depth + 1);
         std::cout << std::endl;
@@ -53,6 +54,7 @@ void LanguageTree::PrintLoadedTree(BaseNode* target, int depth)
         while (currentChild != end) {
             int a = 12 * (depth + 1) + 4 * depth;
             std::cout << std::setw(a) << *target << " -> ";
+            //std::cout << currentChild->first << std::endl;
             PrintLoadedTree(currentChild->second, depth + 1);
             std::cout << std::endl;
             currentChild++;
@@ -139,6 +141,7 @@ void LanguageTree::LoadTree()
 }
 void LanguageTree::LoadWord(std::string word)
 {
+    //std::cout << "Made it to Load Word" << std::endl;
     std::ifstream storage;
     storage.open("LTreeStorage.txt");
     std::ofstream buffer;
@@ -146,10 +149,12 @@ void LanguageTree::LoadWord(std::string word)
     std::string line;
     while (std::getline(storage, line))
     {
+        std::cout << "In Loop?" << std::endl;
         std::vector<std::string> brokenLine = SplitStringBySpaceOnly(line);
         int size = brokenLine.size();
         if (brokenLine[8] == word)
         {
+            std::cout << "Creating Node " << word << std::endl;
             NewNode(word, brokenLine[4], StringtoInt(brokenLine[10]));
         }
         else
@@ -157,6 +162,7 @@ void LanguageTree::LoadWord(std::string word)
             buffer << line << std::endl;
         }
     }
+    //std::cout << "Out of loop" << std::endl;
     buffer.close();
     std::ifstream buffer2;
     buffer2.open("LTreeBuffer.txt");
@@ -217,21 +223,33 @@ BaseNode* LanguageTree::getStart()
     //Find Node Functions
 BaseNode* LanguageTree::findWord(std::string targetWord)
 {
+    std::cout << "FindWord without Parents" << std::endl;
     auto it = start->getChildernBegin();
     auto end = start->getChildernEnd();
+    std::cout << "Loop?" << std::endl;
     while (it != end) {
-        BaseNode* result = it->second->getChild(targetWord);
-        if (result != nullptr)
-            return result;
+        if(it->second!=nullptr)
+        {
+            BaseNode* result = it->second->getChild(targetWord);
+            if (result != nullptr)
+                return result;
+        }
+        std::cout << "Is it this ++" << std::endl;
         it++;
     }
+    std::cout << "Found Nothing" << std::endl;
     return nullptr;
 }
 BaseNode* LanguageTree::findWord(std::string targetWord, std::string parent)
 {
+    //std::cout << "FindWord" << std::endl;
+    //PrintLoadedTree();
     BaseNode* parentNode = start->getChild(parent);
+    //PrintLoadedTree();
+    std::cout << "IF" << std::endl;
     if (parentNode != nullptr)
         return parentNode->getChild(targetWord);
+    //std::cout << "Returning" << std::endl;
     return findWord(targetWord);
 }
 bool LanguageTree::inFile(std::string targetWord)
@@ -266,17 +284,34 @@ int LanguageTree::TimesUsedFromFile(std::string targetWord)//Crashes if file get
 //add node functions
 void LanguageTree::NewNode(std::string child, std::string parent, int times)
 {
+    //std::cout << "In New Node" << std::endl;
+    //std::cout << std::hash<std::string>()("Test") << std::endl;
+    //findWord("Test");
+    //PrintLoadedTree();//passed
     if (findWord(child, parent) != nullptr)//Checks if the node already exist using the parent to refine the search
     {
         return;
     }
-    if (findWord(parent) == nullptr)
+    //std::cout << "Creating title node?" << std::endl;
+    //PrintLoadedTree();//Caused to die before noun is made but works till car without Findword(child,Parent) is likely problem
+    if (findTitle(parent) == nullptr)
     {
-        NewTitleNode(parent);
+        //std::cout << "Could not find title " << parent << std::endl;
+        NewTitleNode(parent);//Problem occuring
+        //std::cout << "Test storage: " << start->getChild(parent) << std::endl;
     }
+    std::cout << "Finding Parent node?" << std::endl;
+    PrintLoadedTree();
     BaseNode* parentNode = findTitle(parent);
-    //std::cout << parentNode<<*parentNode << std::endl;
+    //std::cout << "**************************" << std::endl;
+    //PrintLoadedTree();
+    //std::cout <<"Parent node is "<< parentNode << *parentNode << std::endl;
+    //std::cout << "Adding Child?" << std::endl;
     parentNode->addChild(child, 0, times);
+    PrintLoadedTree();
+    //std::cout << "**************************" << std::endl;
+
+    //std::cout << "Leaving New Node" << std::endl;
 }
 void LanguageTree::NewTitleNode(std::string child)
 {
@@ -286,36 +321,8 @@ void LanguageTree::NewTitleNode(std::string child)
         return;
     }
     BaseNode* newNode = new BaseNode(child, 1,*start);
-
-    if (child == "Noun")
-    {
-        noun = newNode;
-        start->addChild(*newNode);
-        return;
-    }
-    else if (child == "Pronoun")
-    {
-        pronoun = newNode;
-        start->addChild(*newNode);
-        return;
-    }
-    else if (child == "Propernoun")
-    {
-        propernoun = newNode;
-        start->addChild(*newNode);
-        return;
-    }
-    else if (child == "Verb")
-    {
-        verb = newNode;
-        start->addChild(*newNode);
-        return;
-    }
-    else
-    {
-        //std::cout << "Failed to create Node "<< child << std::endl;
-        delete newNode;
-    }
+    //std::cout << "Adding node " << *newNode << " at address " << newNode << std::endl;
+    start->addChild(*newNode);
 }
 //Remove node functions
 void LanguageTree::RemoveLangNode(std::string Target)
@@ -323,7 +330,7 @@ void LanguageTree::RemoveLangNode(std::string Target)
     BaseNode* Targetaddress = findWord(Target);
     if (Targetaddress == nullptr)
     {
-        std::cout << "Target does not exist" << std::endl;
+        //std::cout << "Target does not exist" << std::endl;
     }
     Targetaddress->getParent()->removeChild(Target);
     Targetaddress->removeParent();

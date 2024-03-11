@@ -12,7 +12,7 @@ CategoryTree::~CategoryTree()
 {
     delete start;
 }
-
+//Problems with save file is due to loading issues
 void CategoryTree::SaveTree()
 {
     std::vector<std::string> CollisionParentList;
@@ -61,6 +61,7 @@ void CategoryTree::SaveTree(CatNode* Target, std::vector<std::string> CollisionP
             }
             printed = 1;
         }
+        CurrentNode++;
     }
     if (!printed)
     {
@@ -196,7 +197,9 @@ void CategoryTree::PrintLoadedTree(CatNode* Target, std::vector<std::string> Col
                 CollisionParentList[CollisionParentList.size() - 1].erase();
             }
             printed = 1;
+            
         }
+        children++;
     }
     if (!printed)
         PrintNode(Target);

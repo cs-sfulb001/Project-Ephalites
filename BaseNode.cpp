@@ -54,7 +54,12 @@ BaseNode* const BaseNode::getParent()
 }
 BaseNode* const BaseNode::getChild(std::string word)
 {
-	return *&Children[std::hash<std::string>()(word)];
+	BaseNode* result = Children[std::hash<std::string>()(word)];//Note: When accessing index i if there is no element in i then it will become a nullptr
+	if (result == nullptr) {
+		Children.erase(std::hash<std::string>()(word));
+		return nullptr;
+	}
+	return result;
 }
 std::unordered_map<int, BaseNode*> const BaseNode::getChildren()
 {
@@ -110,12 +115,14 @@ void BaseNode::addChild(std::string childWord, bool childTitle, int times)
 {
 	BaseNode* newChild = new BaseNode(childWord, childTitle, *this, times);
 	int hashvalue = std::hash<BaseNode>()(*newChild);
-	Children.insert(std::make_pair(hashvalue, newChild));
+	std::cout << "Adding " << *newChild << " at " << hashvalue << "address: " << newChild << std::endl;
+	Children[hashvalue] = newChild;
 }
 void BaseNode::addChild(BaseNode& newChild)
 {
 	int hashvalue = std::hash<BaseNode>()(newChild);
-	Children.insert(std::make_pair(hashvalue, &newChild));
+	std::cout << "Adding " << newChild << " at " << hashvalue << "address: "<< &newChild<<std::endl;
+	Children[hashvalue]=&newChild;
 }
 void BaseNode::setTimesUsed(int times)
 {

@@ -1,2 +1,2 @@
-The minimum times used to be stored in ram is 3
+The minimum times used to be stored in ram is 0
 The maxium RAM that can be used is 2 GB

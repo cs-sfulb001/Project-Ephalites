@@ -72,11 +72,21 @@ int const CatNode::getNumParents()
 */
 CatNode* const CatNode::getChild(std::string word)
 {
-	return Children[std::hash<std::string>{}(word)];
+    CatNode* result = Children[std::hash<std::string>()(word)];//Note: When accessing index i if there is no element in i then it will become a nullptr
+    if (result == nullptr) {
+        Children.erase(std::hash<std::string>()(word));
+        return nullptr;
+    }
+    return result;
 }
 CatNode* const CatNode::getParent(std::string word)
 {
-	return Parents[std::hash<std::string>{}(word)];
+    CatNode* result = Parents[std::hash<std::string>()(word)];//Note: When accessing index i if there is no element in i then it will become a nullptr
+    if (result == nullptr) {
+        Parents.erase(std::hash<std::string>()(word));
+        return nullptr;
+    }
+    return result;
 }
 bool const CatNode::getIsCollision()
 {
@@ -178,12 +188,12 @@ void CatNode::AddCollisionParent(std::vector<std::string> CCP, int newCollisionP
 void CatNode::addParent(CatNode& Target)
 {
     int hashvalue = std::hash<CatNode>()(Target);
-    Parents.insert(std::make_pair(hashvalue, &Target));
+    Parents[hashvalue]= &Target;
 }
 void CatNode::addChild(CatNode& Target)
 {
     int hashvalue = std::hash<CatNode>()(Target);
-    Children.insert(std::make_pair(hashvalue, &Target));;
+    Children[hashvalue] = &Target;
 }
 //Removes
 void CatNode::removeChild(std::string Target)

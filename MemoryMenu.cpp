@@ -36,10 +36,12 @@ void MemoryMenu::MemoryMenuStart()
         case 1:
             Control->printCollisions();
             break;
-        case 2:
+        case 2://Currently Fails inf loop?
+            std::cout << "Selected Option 2" << std::endl;
             Control->AddToLTree();
             break;
-        case 3:
+        case 3://Currently Fails inf loop?
+            std::cout << "Selected Option 3" << std::endl;
             Control->ConnectInCTree();
             break;
         default:
@@ -47,5 +49,5 @@ void MemoryMenu::MemoryMenuStart()
             break;
         }
     }
-    Control->SaveTrees();
+    Control->SaveTrees();//Inf Loop. Not moving to next line when printing to file
 }
