@@ -149,12 +149,12 @@ void LanguageTree::LoadWord(std::string word)
     std::string line;
     while (std::getline(storage, line))
     {
-        std::cout << "In Loop?" << std::endl;
+        //std::cout << "In Loop?" << std::endl;
         std::vector<std::string> brokenLine = SplitStringBySpaceOnly(line);
         int size = brokenLine.size();
         if (brokenLine[8] == word)
         {
-            std::cout << "Creating Node " << word << std::endl;
+            //std::cout << "Creating Node " << word << std::endl;
             NewNode(word, brokenLine[4], StringtoInt(brokenLine[10]));
         }
         else
@@ -223,10 +223,10 @@ BaseNode* LanguageTree::getStart()
     //Find Node Functions
 BaseNode* LanguageTree::findWord(std::string targetWord)
 {
-    std::cout << "FindWord without Parents" << std::endl;
+    //std::cout << "FindWord without Parents" << std::endl;
     auto it = start->getChildernBegin();
     auto end = start->getChildernEnd();
-    std::cout << "Loop?" << std::endl;
+    //std::cout << "Loop?" << std::endl;
     while (it != end) {
         if(it->second!=nullptr)
         {
@@ -234,10 +234,10 @@ BaseNode* LanguageTree::findWord(std::string targetWord)
             if (result != nullptr)
                 return result;
         }
-        std::cout << "Is it this ++" << std::endl;
+        //std::cout << "Is it this ++" << std::endl;
         it++;
     }
-    std::cout << "Found Nothing" << std::endl;
+    //std::cout << "Found Nothing" << std::endl;
     return nullptr;
 }
 BaseNode* LanguageTree::findWord(std::string targetWord, std::string parent)
@@ -246,7 +246,7 @@ BaseNode* LanguageTree::findWord(std::string targetWord, std::string parent)
     //PrintLoadedTree();
     BaseNode* parentNode = start->getChild(parent);
     //PrintLoadedTree();
-    std::cout << "IF" << std::endl;
+    //std::cout << "IF" << std::endl;
     if (parentNode != nullptr)
         return parentNode->getChild(targetWord);
     //std::cout << "Returning" << std::endl;
@@ -300,15 +300,15 @@ void LanguageTree::NewNode(std::string child, std::string parent, int times)
         NewTitleNode(parent);//Problem occuring
         //std::cout << "Test storage: " << start->getChild(parent) << std::endl;
     }
-    std::cout << "Finding Parent node?" << std::endl;
-    PrintLoadedTree();
+    //std::cout << "Finding Parent node?" << std::endl;
+    //PrintLoadedTree();
     BaseNode* parentNode = findTitle(parent);
     //std::cout << "**************************" << std::endl;
     //PrintLoadedTree();
     //std::cout <<"Parent node is "<< parentNode << *parentNode << std::endl;
     //std::cout << "Adding Child?" << std::endl;
     parentNode->addChild(child, 0, times);
-    PrintLoadedTree();
+    //PrintLoadedTree();
     //std::cout << "**************************" << std::endl;
 
     //std::cout << "Leaving New Node" << std::endl;
