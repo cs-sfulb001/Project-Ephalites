@@ -115,13 +115,13 @@ void BaseNode::addChild(std::string childWord, bool childTitle, int times)
 {
 	BaseNode* newChild = new BaseNode(childWord, childTitle, *this, times);
 	int hashvalue = std::hash<BaseNode>()(*newChild);
-	std::cout << "Adding " << *newChild << " at " << hashvalue << "address: " << newChild << std::endl;
+	//std::cout << "Adding " << *newChild << " at " << hashvalue << "address: " << newChild << std::endl;
 	Children[hashvalue] = newChild;
 }
 void BaseNode::addChild(BaseNode& newChild)
 {
 	int hashvalue = std::hash<BaseNode>()(newChild);
-	std::cout << "Adding " << newChild << " at " << hashvalue << "address: "<< &newChild<<std::endl;
+	//std::cout << "Adding " << newChild << " at " << hashvalue << "address: "<< &newChild<<std::endl;
 	Children[hashvalue]=&newChild;
 }
 void BaseNode::setTimesUsed(int times)
